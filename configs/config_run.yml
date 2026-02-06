@@ -1,0 +1,61 @@
+common:
+    my_dir: "/misc/alidata140/alice_u/apishchaeva/analysis/PhotonMomentumResolution_new_output_final_version"
+    my_dir_data: "/misc/alidata140/alice_u/apishchaeva/analysis/data/"
+    output_folder:  "RV0_analysis_results_final_diff_RV0s_cent80_5_02_2026"
+    # diff occupancy files: PbPb/606036_EM_LHC23_pass5_Photons_cent_20_occup_30000_more PbPb/605049_EM_LHC23_pass5_Photons_cent_20_occup_0_10000.root PbPb/605397_EM_LHC23_pass5_Photons_cent_20_occup_10000_30000.root 606374_EM_LHC23_pass5_Photons_cent_20_occup_0_more
+    # diff RV0s files: PbPb/585993_EM_LHC23_pass5_Photons_diff_RV0_cent_80.root
+    # diff cent: PbPb/589782_EM_LHC23_pass5_Photons_all_cent_cent_10_R_4_90.root 606374_EM_LHC23_pass5_Photons_cent_20_occup_0_more
+    input_file_data: "PbPb/585993_EM_LHC23_pass5_Photons_diff_RV0_cent_80.root"  #" pp/data/585397_585381_EM_LHC24ap_EM_LHC24aq_PCMPhotns_pass1_medium_diff_R.root"
+    # diff occupancy files: 607073_EM_LHC25f3_MC_PCMAndDalitz_cent_20_occup_0_more.root, 607332_EM_LHC25f3_MC_PCMAndDalitz_cent_20_occup_0_10000.root, 607933_EM_LHC25f3_MC_PCMAndDalitz_cent_20_occup_10000_30000.root, 608197_EM_LHC25f3_MC_PCMAndDalitz_cent_20_occup_30000_more.root
+    # diff RV0s files: 585376_EM_LHC25f3_MC_PCMAndDalitz_diff_RV0_cent_80
+    # diff cent: MC/566180_564219_EM_LHC25f3_MC_PCMAndDalitz_10_R_4_90.root MC/509772_EM_LHC25f3_MC_PCMAndDalitz_cent20
+    input_file_mc: "MC/585376_EM_LHC25f3_MC_PCMAndDalitz_diff_RV0_cent_80.root" # pp/MC/563231_563453_R_4_90.root
+    name_config_pi0_data_PCM: "./configs/config_PbPb_5.36TeV_pi0_LHC23_full_pcm.yml" #"./configs/config_pp_5.36TeV_pi0_LHC24aq_LHC24ap_medium_pcm.yml"   #"./configs/config_PbPb_5.36TeV_pi0_LHC23_full_pcm.yml"
+    name_config_pi0_data_Dalitz: "./configs/config_PbPb_5.36TeV_pi0_LHC23_full_dalitz.yml"
+    name_config_pi0_mc_PCM: "configs/config_PbPb_5.36TeV_pi0_LHC25f3_full_pcm.yml" # config_pp_5.36TeV_pi0_LHC25b4a6_LHC25b4b6_full config_PbPb_5.36TeV_pi0_LHC25f3_full_pcm
+    name_config_pi0_mc_Dalitz: "configs/config_PbPb_5.36TeV_pi0_LHC25f3_full_dalitz.yml"
+    name_config_eta_data_PCM: "./configs/config_PbPb_5.36TeV_eta_LHC23_full_pcm.yml" #config_PbPb_5.36TeV_eta_LHC23_full_pcm.yml config_pp_5.36TeV_eta_LHC24aq_LHC24ap_medium_pcm
+    name_config_eta_data_Dalitz: "./configs/config_PbPb_5.36TeV_eta_LHC23_full_dalitz.yml"
+    name_config_eta_mc_PCM: "configs/config_PbPb_5.36TeV_eta_LHC25f3_full_pcm.yml" #config_PbPb_5.36TeV_eta_LHC25f3_full_pcm.yml config_pp_5.36TeV_eta_LHC25b4a6_LHC25b4b6_full
+    name_config_eta_mc_Dalitz: "configs/config_PbPb_5.36TeV_eta_LHC25f3_full_dalitz.yml"
+    meson_array: ["pi0"] #pi0, eta
+    type_array: ["mc"]
+    decay_array: ["PCM"]
+    start_pt_array: [False]
+    cutname: "qc"
+    suffix: "AnyTrack"
+    date: "this_analysis"
+    all_cent: False # False - doesn't include 0-100% (other other big interval, a.k.a. 0-80%) in the plots, True - does include 0-100% in the plots
+    diff_cent: False # True - subsystems are systems of different centralities, False - only one centrality
+    compare_RV0: False #True - compares corrected yields of diff RV0 if we have diff_cent - True
+    compare_occupancy: False
+    diff_RV0: True #True - subsystems are systems of different RV0, comparison diff RV0 among themselves
+    energy: "5.36 TeV"
+    system: "Pb-Pb" #"pp"  #"Pb-Pb"
+statements:
+    inv_mass_raw_yield: False
+    eff_acc_corr_yield: True
+    comp_dalitz_pcm: False
+    comp_eta_pi0: False
+compare:
+    comparison_to_other_data: False
+    energy_of_other_file: "5.02 TeV"
+    system_of_other_file: "Pb-Pb"
+    obj_name: "RV0s_of_diff_systems" # what you want to compare:"RV0s_of_diff_systems" "corr_yield, corr_yield_ratio, eff_acc, eff_acc_scaled, eff_acc_ratio, eff_acc_scaled_ratio", "eta_pi0_ratio"
+    is_ratio: False # True - you want also to compare the ratio of the given obj_name to the ratio of your data
+    system: "Dalitz_PCM" # "eta_pi0" - fixing pi0, eta and going over decays, "Dalitz_PCM" - fixing Dalitz, PCM and going over meson
+    comparison_file_PCM: "13TeV/data_PCMResultsFullCorrection_PP_13TeVFinal.root" # the path to the file
+    dir_to_histo_PCM: "" #Eta13TeV #the path to the histo inside the file
+    histo_PCM_name: "" #EtaToPi0YShiftedShiftCorr_INT7 #the name of the histo
+    comparison_file_Dalitz: "13TeV/data_PCMDalitzResultsFullCorrection_PP_13TeV.root"
+    dir_to_histo_Dalitz: "" #Eta13TeV
+    histo_Dalitz_name: "" #EtaToPi0YShiftedShiftCorr_INT7
+    comparison_file_pi0: "5TeV/HEPData_502.root" #"run2/MBW_cocktainInput/pi0_data_run2_0.root" #"5TeV/HEPData_502.root" "13TeV/data_PCMResultsFullCorrection_PP_13TeVFinal_1.root"
+    dir_to_histo_pi0: "Table 1"  #"" #Table 1
+    histo_pi0_name: "" #"" #"fMCMesonAccepPt"
+    comparison_file_eta: "5TeV/HEPData_502.root" #"run2/MBW_cocktainInput/eta_data_run2_0.root" #"5TeV/HEPData_502.root" "13TeV/data_PCMResultsFullCorrection_PP_13TeVFinal_1.root"
+    dir_to_histo_eta: "Table 1"  #"" #Table 1
+    histo_eta_name: "" #"" #"fMCMesonAccepPt"
+
+
+

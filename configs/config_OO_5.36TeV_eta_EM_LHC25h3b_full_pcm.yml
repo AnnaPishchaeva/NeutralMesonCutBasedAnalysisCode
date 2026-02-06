@@ -1,0 +1,90 @@
+common:
+    system : "OO"
+    energy : "5.36 TeV" #center-of-mass energy in TeV
+    meson : "eta" 
+    period : "LHC25h3b"
+    plotting_type: "thesis"
+    background_fit: "Asymmetric Gaussian fit"
+    do_ptspectrum: True
+    pt_bin: [0.5,1.,1.5, 2.0,2.5, 3.0, 3.5, 4,4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0,11] #middleSteps
+    RV0_bin: [4,30,58,90]
+    RV0_general: [4, 90]
+    start_pT_bin: 1
+    fit_min: [0.45]
+    fit_max: [0.62]
+    integral_min: [0.65] #0.62
+    integral_max: [0.7] #0.66
+    yield_min: [0.065]
+    yield_max: [0.04]
+data:
+    fit_func: ["gausexplinear"] 
+    fit_parameters: [0,0,0,0,0]
+    fit_limit_min: [0,0,0,0,0]
+    fit_limit_max: [0,0,0,0,0]
+    subsystems: 
+        # - name: "PCMPCM"
+          # cuts:
+        - name: "pi0eta-to-gammagamma-pcmpcm"
+          mc_name: "pi0eta-to-gammagamma-mc-pcmpcm"
+             # initial values: []
+          fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+          fit_limit_min: [0.97,0.926,0.85,0.8]
+          fit_limit_max: [1.2,1.02,1.5,1.1]
+mc:
+    fit_func: ["gausexp"] 
+    fit_parameters: [0,0,0,0,0]
+    fit_limit_min: [0,0,0,0,0]
+    fit_limit_max: [0,0,0,0,0]
+    subsystems: 
+        # - name: "PCMPCM"
+          # cuts:
+        #- name: "pi0eta-to-gammagamma-pcmpcm_0-20"
+        #  mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_0-20"
+        #      # initial values: []
+        #  fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+        #  fit_limit_min: [0.999,0.926,0.6,0.6]
+        #  fit_limit_max: [1.1,1.02,1.5,1.2]
+        #- name: "pi0eta-to-gammagamma-pcmpcm_20-40"
+        #  mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_20-40"
+        #      # initial values: []
+        #  fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+        #  fit_limit_min: [0.999,0.926,0.6,0.6]
+        #  fit_limit_max: [1.1,1.02,1.5,1.2]
+        #- name: "pi0eta-to-gammagamma-pcmpcm_40-60"
+        #  mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_40-60"
+        #      # initial values: []
+        #  fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+       #   fit_limit_min: [0.999,0.926,0.6,0.6]
+       #   fit_limit_max: [1.1,1.02,1.5,1.2]
+       # - name: "pi0eta-to-gammagamma-pcmpcm_60-80"
+       #   mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_60-80"
+       #       # initial values: []
+       #   fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+       #   fit_limit_min: [0.999,0.926,0.6,0.6]
+       #   fit_limit_max: [1.1,1.02,1.5,1.2]
+       # - name: "pi0eta-to-gammagamma-pcmpcm_80-100"
+       #   mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_80-100"
+       #       # initial values: []
+       #   fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+       #   fit_limit_min: [0.999,0.926,0.6,0.6]
+       #   fit_limit_max: [1.1,1.02,1.5,1.2]
+        - name: "pi0eta-to-gammagamma-pcmpcm_RV0_4_30"
+          mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_4_30"
+          fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+          fit_limit_min: [0.9,0.9,0.3,0.3]
+          fit_limit_max: [1.1,1.02,1.3,1.8]
+        - name: "pi0eta-to-gammagamma-pcmpcm_RV0_30_58"
+          mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_30_58"
+          fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+          fit_limit_min: [0.9,0.9,0.3,0.3]
+          fit_limit_max: [1.1,1.02,1.3,1.8]
+        - name: "pi0eta-to-gammagamma-pcmpcm_RV0_58_90"
+          mc_name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_58_90"
+          fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+          fit_limit_min: [0.9,0.9,0.3,0.3]
+          fit_limit_max: [1.1,1.02,1.3,1.8]
+        - name: "pi0eta-to-gammagamma-pcmpcm"
+          mc_name: "pi0eta-to-gammagamma-mc-pcmpcm"
+          fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+          fit_limit_min: [0.9,0.9,0.3,0.3] #mean init test
+          fit_limit_max: [1.1,1.02,1.3,1.8] #higher lambda limit, smaller sigma

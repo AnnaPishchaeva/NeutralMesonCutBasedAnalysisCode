@@ -1,0 +1,47 @@
+common:
+    system : "pp"
+    energy : 13.6 #center-of-mass energy in TeV
+    meson : "pi0" 
+    period : "LHC22f"
+    do_ptspectrum: True
+    pt_bin: [0.4, 0.8, 1.2, 1.6, 2.0, 3.0, 4.0, 6.0, 12.0]
+    fit_min: [0.04] # previously 0.06
+    fit_max: [0.2] 
+    integral_min: [0.18]
+    integral_max: [0.25]
+    yield_min: [0.035]
+    yield_max: [0.02] # previously 0.01
+    leg_entry: "Data #gamma candidates (LHC23zc)"
+data:
+    fit_func: ["gausexplinear"] 
+    fit_parameters: [0,0,0,0,0]
+    fit_limit_min: [0,0,0,0,0]
+    fit_limit_max: [0,0,0,0,0]
+    subsystems: 
+        - name: "PCMPCM"
+          cuts:
+            - name: "analysis_analysis"
+              # initial values: height = 
+              fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+              fit_limit_min: [0.99,0.926,0.8,0.85]
+              fit_limit_max: [1.2,1.02,1.6,1.5]
+            - name: "qc_qc"
+              # initial values: []
+              fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+              fit_limit_min: [0.97,0.926,0.85,0.8]
+              fit_limit_max: [1.2,1.02,1.5,1.1]
+            - name: "qc_ITSTPC_qc_ITSTPC"
+              fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+              fit_limit_min: [0.999,0.92,0.6,0.5]
+              fit_limit_max: [1.4,1.02,1.2,1.2]
+            - name: "qc_TPConly_qc_TPConly"
+              fit_parameters: [height,mean_init,sigma_init,lambda_init,50, -100]
+              fit_limit_min: [0.9,0.926,0.65,0.8]
+              fit_limit_max: [1.2,1.02,1.3,1.4]
+# mc:
+#     fit_func: ["gausexp"] 
+#     subsystems: 
+#         - name: "PCMPCM"
+#           cutnames:
+#           - "analysis_analysis"
+#           - "qc_qc"
