@@ -1,8 +1,8 @@
 # This code is based on the code provided by Daiki Sekihata in his repository
 # https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
 # This code was written by Alica Enderich (Febuary 2024)
-# This code was modified by Julia Schlägel (July 2024)
-
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import numpy as np
 import datetime
@@ -35,7 +35,7 @@ class Plot_inv_mass:
     def __init__(
         self,
         meson: str ,
-        ssname, plotting = "none"
+        ssname, arr_pt = [], plotting = "none"
         ) -> str:
         """_summary_
 
@@ -52,7 +52,7 @@ class Plot_inv_mass:
         print("#################################################")
         self.meson = meson;
         self.ssname = ssname
-        self.arr_pt = np.array([0,1,2,3,4,5], dtype=float);
+        self.arr_pt = arr_pt
         self.number_columns = 1
         self.number_rows = 1
         if self.meson == "pi0":
@@ -61,11 +61,16 @@ class Plot_inv_mass:
             self.plotting_range = [0.3, 0.8]
         self.plotting = plotting
 
-    def set_rows_columns(self, arr_pt):
-        number = np.sqrt(len(arr_pt))
+    def set_rows_columns(self, histogram_list):
+        number = np.sqrt(len(self.arr_pt))
         right_number = math.ceil(number)
         self.number_rows = right_number
         self.number_columns = right_number
+        if len(histogram_list) == self.number_rows*self.number_columns:
+            self.number_rows +=1
+        elif (self.number_rows*self.number_columns - len(histogram_list)) > self.number_rows:
+            self.number_rows -=1
+        print("rows = ", self.number_rows, "columns = ", self.number_columns)
 
     def draw_line(self, drawing_option, pad, place, legend, yield_option, yMin, yMax, mean, npt, iPt):
         pad.cd(place)
@@ -134,8 +139,9 @@ class Plot_inv_mass:
             if info_decay.get_meson() == "eta":
                 title.AddText("Parameters for asymmetric Gaussian fit on invariant mass of #eta");
         if is_one_pad:
-                startPt = info_decay.arr_pt[iPt+info_decay.get_start_pt()];
-                endPt = info_decay.arr_pt[iPt+info_decay.get_start_pt()+1];
+                pt_range_for_drawing = self.arr_pt[iPt]
+                startPt = pt_range_for_drawing[0]
+                endPt = pt_range_for_drawing[1]
                 title.AddText("{:.2f} GeV/#it{{c}} < #it{{p}}_{{T}}  < {:.2f} GeV/#it{{c}}".format(startPt, endPt));
         title.Draw();
         ROOT.SetOwnership(title,False);
@@ -283,12 +289,13 @@ class Plot_inv_mass:
     def draw_inv_mass_and_fit(self, drawing_option, pad, info_decay, iPt, place, histogram_list, histogram_list2, is_one_pad):
         no_entries = histogram_list[iPt].GetEntries()
         print("entries histo: ", no_entries)
+        pt_range_for_drawing = self.arr_pt[iPt]
         if no_entries == 0: #if the number of entries is really low
             print ("centrality: ",info_decay.get_cent(),"pt: ",iPt, "entries:", no_entries)
             return 0,0
-        startPt = info_decay.arr_pt[iPt+info_decay.get_start_pt()];
-        print(info_decay.arr_pt[iPt], "+3","+4")
-        endPt = info_decay.arr_pt[iPt+info_decay.get_start_pt()+1];
+        startPt = pt_range_for_drawing[0]
+        endPt = pt_range_for_drawing[1]
+        print("drawing pt range: ", pt_range_for_drawing)
 
         if not is_one_pad:
             pad.SetFillColor(0)
@@ -298,6 +305,7 @@ class Plot_inv_mass:
             pad.cd(place).SetBottomMargin(0.15);
             pad.cd(place).SetRightMargin(0.15);
             pad.cd(place).SetLeftMargin(0.15); # -> change values later to make neater
+            pad.cd(place).SetTitle("hji")
 
         title_pt = "{:.2f} GeV/#it{{c}} < #it{{p}}_{{T}}  < {:.2f} GeV/#it{{c}}".format(startPt, endPt);
 
@@ -325,7 +333,6 @@ class Plot_inv_mass:
 
         FrameSettings(frame, "#it{{M}}{} (GeV/#it{{c}}^{{2}})".format(info_decay.get_decay_channel()), "d#it{{N}}{}/d#it{{M}}{} [counts]".format(info_decay.get_decay_channel(), info_decay.get_decay_channel()),
                     self.plotting_range[0], self.plotting_range[1], is_one_pad)
-
         if info_decay.get_typ() == "mc":
             DrawHisto(histogram_list[iPt], kBlue, "Hsame", 1.5, kOpenCircle)
         else:
@@ -473,10 +480,9 @@ class Plot_inv_mass:
 
     def plot_inv_mass(self, drawing_option, info_decay, histogram_list, histogram_list2, name_plot, yield_option, is_one_pad = False):
         TGaxis.SetMaxDigits(3);
-        self.set_rows_columns(info_decay.arr_pt)
+        self.set_rows_columns(histogram_list)
         if is_one_pad:
             self.number_rows, self.number_columns = 1, 1
-
         if is_one_pad:
             npt = 1
         else:

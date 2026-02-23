@@ -1,5 +1,8 @@
 # This code is based on the code provided by Daiki Sekihata in his repository
 # https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
+# This code was written by Alica Enderich (Febuary 2024)
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import os, sys, shutil
 import numpy as np
@@ -423,6 +426,8 @@ class Pair_analyzer:
     #______________________________________________________________________
     def analyze_ptspectrum(self, info_decay, isys):
         print("Pair_analyzer.py: in the function analyze_ptspectrum for the subsystem ", isys)
+        is_enough_statistics = False
+        pt_list_for_drawing = []
         outlist = []
         npt = len(self.arr_pt);
 
@@ -541,7 +546,8 @@ class Pair_analyzer:
 
             if height < 7: #a.k.a. if the amount of accounts inside the peak is too low, we skip this diagram
                 continue
-
+            is_enough_statistics = True
+            pt_list_for_drawing.append([pt1, pt2])
             if len(fit_func) == 1:
                 fit_func_for_one_pT = fit_func[0]
             else:
@@ -717,9 +723,12 @@ class Pair_analyzer:
         if self.typ == "data":
             outlist.append(h1significance)
         outlist.append(h1statuncert)
+        info_decay.set_pt_list_for_drawing(pt_list_for_drawing)
 
         del h1amplitude
         del h1mean
+        if not is_enough_statistics:
+            raise ValueError("Not enough statistics to proceed. No inv mass with the condition of height<... was plotted for any pt bins for that subsystem")
         del tf1_fwhm
         del h1ev
         del h1exponential

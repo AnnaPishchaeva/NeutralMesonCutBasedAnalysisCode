@@ -43,30 +43,32 @@ Which classes are used to run the code:
 
 1) Analysis.py is the program where the essential part of the analysis happens. It calls out the class Calculation.py which extracts inv masses, calculates yields. It also compares the data and calls out the classes that write histos in root, pdf, pkl files
 
-2) Calculation.py is the program where the extractions and calculations of inv masses, yields happen. It calls out the classes that directly calculate everything
+2) Info_decay.py is a program where the whole information about the decay is written, a.k.a. centrality, type of meson, type of decay, etc
 
-3) Pair_analyzer.py is the program where the inv_mass with the fir parameters are extracted and raw yield, stat. uncert, and significance are calculated
+3) Calculation.py is the program where the extractions and calculations of inv masses, yields happen. It calls out the classes that directly calculate everything
 
-4) Corrected_yield.py, Efficiency.py,... are programs that calculate corrected yield and efficiency*acceptance
+4) Pair_analyzer.py is the program where the inv_mass with the fir parameters are extracted and raw yield, stat. uncert, and significance are calculated
 
-5) Write_pdf.py is the program that writes down the histos into pdf files
+5) Corrected_yield.py, Efficiency.py,... are programs that calculate corrected yield and efficiency*acceptance
 
-6) Write_in_file.py is the program that writes down the histos into root, pkl files
+6) Write_pdf.py is the program that writes down the histos into pdf files
 
-7) Get_histo.py is the program that extracts histos from root, pkl files
+7) Write_in_file.py is the program that writes down the histos into root, pkl files
 
-8) Plot_(inv_mass, yield, efficiency) are the programs that plots particular histograms on pdf
+8) Get_histo.py is the program that extracts histos from root, pkl files
 
-9) Compare.py is the program that compares datasets or mesons or decays between each other and writes them down
+9) Plot_(inv_mass, yield, efficiency) are the programs that plots particular histograms on pdf
 
-10) Read_config.py is the program that reads the information from the main config file "config_run.yml" and gives it to "run_new.py"
+10) Compare.py is the program that compares datasets or mesons or decays between each other and writes them down
+
+11) Read_config.py is the program that reads the information from the main config file "config_run.yml" and gives it to "run_new.py"
 ################################################################################
 
 ################################################################################
 Which config files are also used to run the code:
 
 Besides using the main config file "config_run.yml" that indicates the main points to run the code (which system one uses, measons, dataset, where the dataset lies, etc),
-there are also other config files (such as "config_PbPb_5.36TeV_eta_LHC23zzh_full_pcm.yml") that contains information about the subsystems that the initial root file has, also which pT range to use, etc)
+there are also other config files (such as "config_PbPb_5.36TeV_eta_LHC23zzh_full_pcm.yml") that contains information about the subsystems that the initial root file has, also which pT range to use, etc
 
 How to use RV0_bin in the config files:
 If one has "diff_RV0" then what matters is the first and the last element of the array of RV0_bin. They will establish the overall range of RV0 (for instance [4,30,58,90] => the overall range is Rmin = 4, Rmax= 90)

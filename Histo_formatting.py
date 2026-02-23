@@ -1,4 +1,5 @@
 # This code was written by Alica Enderich (Febuary, 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import ROOT
 from ROOT import TH1D, TH2D, TH3D, TGraph, TGraphErrors, TLatex, TPaveText, TLegend, TCanvas, TPad, TString, TLine
@@ -69,7 +70,7 @@ def SetTitle(titlePt):
     TitlePlot = TPaveText(0.34, 0.92, 0.64, 0.98, "NDC")
     TitlePlot.AddText("{}".format(titlePt))
     TitlePlot.SetTextColor(1);
-    TitlePlot.SetTextSize(0.08);
+    TitlePlot.SetTextSize(0.08)
     TitlePlot.SetFillStyle(0)
     TitlePlot.SetBorderSize(0)
     TitlePlot.Draw();
@@ -110,7 +111,7 @@ def set_pad(x_low, y_low, x_up, y_up, color, number_columns = 1, number_rows = 1
         if number_columns > 7:
             width_legend = 2./number_columns;
         x_low = 1-width_legend
-        y_low = 1-height_legend-0.11
+        y_low = 1-height_legend-0.10
     pad = TPad("p1", "", x_low, y_low, x_up, y_up, color)
     pad.SetPad(x_low, y_low, x_up, y_up)
     pad.SetFillColor(0);
@@ -161,7 +162,7 @@ def set_txt_system(energy, system, decay, cent1, cent2):
     txt2.Draw()
     ROOT.SetOwnership(txt2,False)
 
-def set_txt_of_plot(info_decay, x1, y1, x2, y2, both_mc_and_data = False, text_size = 0.02, is_stat_uncert = False):
+def set_txt_of_plot(info_decay, x1, y1, x2, y2, both_mc_and_data = False, text_size = 0.02, number_of_histo = 1, is_stat_uncert = False, comp_w_other_file = False):
 
     txt = set_txt(x1,y1,x2,y2,"NDC", text_size, 33)
     txt.AddText("this thesis")
@@ -185,24 +186,24 @@ def set_txt_of_plot(info_decay, x1, y1, x2, y2, both_mc_and_data = False, text_s
         txt2.Draw()
         ROOT.SetOwnership(txt2,False)
 
+    if not comp_w_other_file:
+        system = info_decay.get_system()
+        if '-' in system:
+            list_system = system.split("-")
+            system = list_system[0] + "#font[122]{-}" + list_system[1]
+        if info_decay.get_system() == "pp":
+            energy_symbol = "#sqrt{s}"
+        else:
+            energy_symbol = "#sqrt{#it{s}_{NN}}"
+        energy = energy_symbol + " = " + info_decay.get_energy()
+        system_energy = "{0}, {1}".format(system, energy)
+        y1, y2 = y1-y_diff, y2-y_diff
+        txt2 = set_txt(x1,y1,x2,y2,"NDC",text_size, 33)
+        txt2.AddText(system_energy)
+        txt2.Draw()
+        ROOT.SetOwnership(txt2,False)
 
-    system = info_decay.get_system()
-    if '-' in system:
-        list_system = system.split("-")
-        system = list_system[0] + "#font[122]{-}" + list_system[1]
-    if info_decay.get_system() == "pp":
-        energy_symbol = "#sqrt{s}"
-    else:
-        energy_symbol = "#sqrt{#it{s}_{NN}}"
-    energy = energy_symbol + " = " + info_decay.get_energy()
-    system_energy = "{0}, {1}".format(system, energy)
-    y1, y2 = y1-y_diff, y2-y_diff
-    txt2 = set_txt(x1,y1,x2,y2,"NDC",text_size, 33)
-    txt2.AddText(system_energy)
-    txt2.Draw()
-    ROOT.SetOwnership(txt2,False)
-
-    if not both_mc_and_data:
+    if not both_mc_and_data and not comp_w_other_file:
         y1, y2 = y1-y_diff, y2-y_diff
         txt3 = set_txt(x1,y1,x2,y2,"NDC",text_size, 33)
         txt3.AddText("{0}, {1}".format(info_decay.get_period(), info_decay.get_typ()))
@@ -238,7 +239,7 @@ def set_txt_of_plot(info_decay, x1, y1, x2, y2, both_mc_and_data = False, text_s
         txt2.Draw()
         ROOT.SetOwnership(txt2,False)
 
-    if not both_mc_and_data:
+    if not both_mc_and_data and number_of_histo == 1 and not comp_w_other_file:
         nev = info_decay.get_Nev_cent()
         Nev = "Number of events: {}".format(f"{nev:.2e}")
         y1, y2 = y1-y_diff, y2-y_diff

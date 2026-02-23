@@ -1,4 +1,5 @@
 # This code was written by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 import sys
 import ROOT
 import yaml
@@ -95,7 +96,7 @@ class Info_decay: #in this class all central things are done that are needed in 
             raise ValueError("System of the main config doesn't coincide with the system of the particle config")
         if len(self.occupancy_list) <=2 and self.is_compare_occupancy:
             raise ValueError("Not enough occup values in the occupancy list of the particle config file to make occupancy comparison!")
-        if len(self.RV0_list) <=2 and self.is_compare_RV0():
+        if len(self.RV0_list) <=2 and self.is_compare_RV0:
             raise ValueError("Not enough RV0 values in the occupancy list of the particle config file to make RV0 comparison!")
         if self.is_start_pt:
             self.start_pt = self.config["common"]["start_pT_bin"]
@@ -207,6 +208,8 @@ class Info_decay: #in this class all central things are done that are needed in 
         if self.is_diff_cent:
             self.V0_radius_min = self.RV0_list[0]
             self.V0_radius_max = self.RV0_list[len(self.RV0_list)-1]
+            if self.plotting_sys == "centralities" and len(self.RV0_list) > 2:
+                return ValueError("File with subsystem of different centrality can only have one interval in RV0s, a.k.a. only 2 values in RV0_bin")
         if self.is_diff_RV0:
             digit_list = [str(character) for character in ssname if character.isdigit()]
             if len(digit_list)>1:
@@ -241,6 +244,11 @@ class Info_decay: #in this class all central things are done that are needed in 
         if decay == "PCM":
             self.decay_channel = "#gamma#gamma"
 
+    def set_pt_list_for_drawing(self, pt_list_for_drawing):
+        print("Info_decay.py: setting pt_list_for_drawing for inv mass of the subsystem...")
+        self.pt_list_for_drawing = pt_list_for_drawing
+        print("pt_list_for_drawing = ", self.pt_list_for_drawing)
+
     def get_filename(self):
         print("Info_decay.py: getting name of the initial input root file...")
         return self.filename
@@ -249,11 +257,11 @@ class Info_decay: #in this class all central things are done that are needed in 
         return self.config
 
     def get_number_ss(self):
-        print("Info_decay.py: getting number of subsystems of the particle config file...")
+        print("Info_decay.py: getting number of subsystems of the particle config file... ", self.nsys)
         return self.nsys
 
     def get_ssname(self):
-        print("Info_decay.py: getting the subsystem of the particle config file...")
+        print("Info_decay.py: getting the subsystem of the particle config file... ", self.ssname)
         return self.ssname
 
     def get_ssname_list(self):
@@ -269,18 +277,18 @@ class Info_decay: #in this class all central things are done that are needed in 
         return self.period
 
     def get_typ(self):
-        print("Info_decay.py: getting the type of the dataset...")
+        print("Info_decay.py: getting the type of the dataset... ", self.typ)
         return self.typ
 
     def get_decay(self):
         return self.decay
 
     def get_meson(self):
-        print("Info_decay.py: getting meson...")
+        print("Info_decay.py: getting meson... ", self.meson)
         return self.meson
 
     def get_cent(self):
-        print("Info_decay.py: getting centrality...")
+        print("Info_decay.py: getting centrality... ", self.cent1, ",", self.cent2)
         return self.cent1, self.cent2
 
     def get_step_cent(self):
@@ -329,11 +337,21 @@ class Info_decay: #in this class all central things are done that are needed in 
     def get_arr_pt (self):
         return self.arr_pt
 
+    def get_pt_list_for_drawing(self):
+        return self.pt_list_for_drawing
+
     def get_RV0_list(self):
         return self.RV0_list
 
     def get_occupancy_list(self):
         return self.occupancy_list
+
+    def get_BR(self):
+        if self.meson == "pi0" and self.decay == "PCM":
+            self.BR = 0.9882
+        if self.meson == "eta" and self.decay == "PCM":
+            self.BR = 0.3936
+        return self.BR
 
     def get_start_pt(self):
         return self.start_pt
@@ -345,7 +363,7 @@ class Info_decay: #in this class all central things are done that are needed in 
         return self.suffix
 
     def get_all_cent(self):
-        print("Info_decay.py: getting all cent, a.k.a. whether the whole range of centrality is plotted...")
+        print("Info_decay.py: getting all cent, a.k.a. whether the whole range of centrality is plotted... ", self.all_cent)
         return self.all_cent
 
     def get_V0_radius_max(self):
@@ -355,7 +373,7 @@ class Info_decay: #in this class all central things are done that are needed in 
         return self.V0_radius_min
 
     def get_occupancy(self):
-        print("Info_decay.py: getting occupancy...")
+        print("Info_decay.py: getting occupancy... ", self.occupancy_min, ", ", self.occupancy_max)
         return self.occupancy_min, self.occupancy_max
 
     def get_decay_channel(self):

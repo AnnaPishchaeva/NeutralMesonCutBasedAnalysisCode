@@ -14,7 +14,7 @@ common:
 mc:
     subsystems:
       diff_RV0:
-        - name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_4_30"
+        - name: "pi0eta-to-gammagamma-mc-pcmdalitzee_RV0_4_30"
           initial_fit_parameters: [1.0, 0.135, 0.006, 0.012]
           fit_parameters_name: [height,mean_init,sigma_init,lambda_init,50, -100]
           fit_param_limit_min: [0.95,0.926,0.25,0.25]
@@ -23,7 +23,7 @@ mc:
           fit_range: [[0.06, 0.18]]
           scale_mix_range: [[0.18, 0.25]]
           yield_range: [[0.035, 0.02]]
-        - name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_30_58"
+        - name: "pi0eta-to-gammagamma-mc-pcmdalitzee_RV0_30_58"
           initial_fit_parameters: [1.0, 0.135, 0.006, 0.012]
           fit_parameters_name: [height,mean_init,sigma_init,lambda_init,50, -100]
           fit_param_limit_min: [0.95,0.926,0.25,0.25]
@@ -32,7 +32,7 @@ mc:
           fit_range: [[0.06, 0.18]]
           scale_mix_range: [[0.18, 0.25]]
           yield_range: [[0.035, 0.02]]
-        - name: "pi0eta-to-gammagamma-mc-pcmpcm_RV0_58_90"
+        - name: "pi0eta-to-gammagamma-mc-pcmdalitzee_RV0_58_90"
           initial_fit_parameters: [1.0, 0.135, 0.006, 0.012]
           fit_parameters_name: [height,mean_init,sigma_init,lambda_init,50, -100]
           fit_param_limit_min: [0.95,0.926,0.25,0.25]
@@ -41,7 +41,7 @@ mc:
           fit_range: [[0.06, 0.18]]
           scale_mix_range: [[0.18, 0.25]]
           yield_range: [[0.035, 0.02]]
-        - name: "pi0eta-to-gammagamma-mc-pcmpcm"
+        - name: "pi0eta-to-gammagamma-mc-pcmdalitzee"
           initial_fit_parameters: [1.0, 0.135, 0.006, 0.012]
           fit_parameters_name: [height,mean_init,sigma_init,lambda_init,50, -100]
           fit_param_limit_min: [0.95,0.926,0.25,0.25]
@@ -51,7 +51,7 @@ mc:
           scale_mix_range: [[0.18, 0.25]]
           yield_range: [[0.035, 0.02]]
       diff_cent:
-        - name: "pi0eta-to-gammagamma-mc-pcmpcm"
+        - name: "pi0eta-to-gammagamma-mc-pcmdalitzee"
           initial_fit_parameters: [1.0, 0.135, 0.006, 0.012]
           fit_parameters_name: [height,mean_init,sigma_init,lambda_init,50, -100]
           fit_param_limit_min: [0.95,0.926,0.5,0.65]

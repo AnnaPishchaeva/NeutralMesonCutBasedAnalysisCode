@@ -50,8 +50,12 @@ class Efficiency:
         h_eff_acc = h1.Clone("h_E_A")
 
         h_eff_acc.Divide(h2)
+        h_eff_acc.SetTitle("")
+        h_eff_acc.GetYaxis().SetTitle("#varepsilon x A x BR")
         if scale_BR == "true":
             info_decay.scale_by_BR(h_eff_acc)
+            h_eff_acc.SetTitle("")
+            h_eff_acc.GetYaxis().SetTitle("#varepsilon x A")
 
         for i in range(0, len(pt)):
             print("###########Efficiency, values and Errors" , pt[i] ,"########")

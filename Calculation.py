@@ -1,4 +1,8 @@
-# This code was written by Alica Enderich (Febuary, 2024)
+# This code is based on the code provided by Daiki Sekihata in his repository
+# https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
+# This code was written by Alica Enderich (Febuary 2024)
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import ROOT
 from ROOT import TH1D, TH2D, TH3D, TGraph, TGraphErrors, TLatex, TPaveText, TLegend, TCanvas, TPad, TString, TLine

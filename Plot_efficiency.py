@@ -1,7 +1,8 @@
 # This code is based on the code provided by Daiki Sekihata in his repository
 # https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
 # This code was written by Alica Enderich (Febuary 2024)
-# This code was modified by Julia Schlägel (July 2024)
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import numpy as np
 import ROOT
@@ -225,7 +226,10 @@ class Plot_efficiency:
                 h1ratio1[iratio] = histo_list[iratio].Clone("h1ratio");
                 h1ratio1[iratio].Reset();
                 h1ratio1[iratio].Sumw2();
-                h1ratio1[iratio].Divide(histo_list[iratio], histo_list[len(histo_list)-1], 1., 1., "G");
+                if plotting == "diff_cent_and_diff_occupancies" or plotting == "occupancies":
+                    h1ratio1[iratio].Divide(histo_list[iratio], histo_list[0], 1., 1., "G")
+                else:
+                    h1ratio1[iratio].Divide(histo_list[iratio], histo_list[len(histo_list)-1], 1., 1., "G");
 
             #finding minimum and max of the histogram
             yMin_ratio, yMax_ratio = self.set_y_min_y_max(h1ratio1)
@@ -236,7 +240,7 @@ class Plot_efficiency:
             elif plotting == "centralities":
                 FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{cent}{cent all}",0., 20.)
             elif plotting == "occupancies" or plotting == "diff_cent_and_diff_occupancies":
-                FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{#it{FT0Occ}}{#it{FT0Occ all}}",0., 20.)
+                FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{#it{FT0Occ}}{0<#it{FT0Occ}<10^{4}}",0., 20.)
             frame2.GetXaxis().SetTitleSize(0.10);
             frame2.GetYaxis().SetTitleSize(0.10);
             frame2.GetXaxis().SetTitleOffset(1.0);
@@ -276,9 +280,9 @@ class Plot_efficiency:
         ROOT.SetOwnership(txt,False);
 
         if plotting == "centralities":
-            set_txt_of_plot(info_decay, 0.87, 0.83, 0.87, 0.83, False, 0.025)
+            set_txt_of_plot(info_decay, 0.87, 0.83, 0.87, 0.83, False, 0.025, len(histo_list))
         else:
-            set_txt_of_plot(info_decay, 0.95, 0.88, 0.95, 0.88, False, 0.025)
+            set_txt_of_plot(info_decay, 0.95, 0.88, 0.95, 0.88, False, 0.025, len(histo_list))
 
         c1.Modified();
         c1.Update();

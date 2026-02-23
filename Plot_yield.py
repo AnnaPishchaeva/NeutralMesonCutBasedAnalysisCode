@@ -2,6 +2,7 @@
 # https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
 # This code was written by Alica Enderich (Febuary 2024)
 # This code was modified by Julia Schlägel (July 2024)
+# This code was modified by Anna Pishchaeva (October 2025)
 
 
 import numpy as np
@@ -153,21 +154,21 @@ class Plot_yield:
         else:
             if type_of_histo == "RawYield":
                 if plotting == "centralities":
-                    set_txt_of_plot(info_decay, 0.58, 0.78, 0.88, 0.88, False, 0.025)
+                    set_txt_of_plot(info_decay, 0.58, 0.78, 0.88, 0.88, False, 0.025, length)
                 else:
-                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, False, 0.025)
+                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, False, 0.025, length)
             elif type_of_histo == "CorrectedYield":
                 if plotting == "centralities":
-                    set_txt_of_plot(info_decay, 0.58, 0.78, 0.88, 0.88, True, 0.025)
+                    set_txt_of_plot(info_decay, 0.58, 0.78, 0.88, 0.88, True, 0.025, length)
                 else:
-                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, True, 0.025)
+                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, True, 0.025, length)
             elif type_of_histo == "Significance":
-                set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, False, 0.025)
+                set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, False, 0.025, length)
             elif type_of_histo == "StatUncert":
                 if is_mc_and_data:
-                    set_txt_of_plot(info_decay, 0.59, 0.78, 0.89, 0.88, True , 0.025, True)
+                    set_txt_of_plot(info_decay, 0.59, 0.78, 0.89, 0.88, True , 0.025, length, True)
                 else:
-                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, True , 0.025)
+                    set_txt_of_plot(info_decay, 0.65, 0.82, 0.95, 0.92, True , 0.025, length)
         txt.Draw();
         ROOT.SetOwnership(txt,False);
 
@@ -298,12 +299,13 @@ class Plot_yield:
             color = [kBlue]
         else:
             color = [kRed, 802, 401, kGreen+1, kGreen-1, kCyan ,kBlue, kMagenta, kMagenta+3, 922, 923, kBlack]
-            if (plotting == "centralities" or plotting == "RV0s"):
+            if (plotting == "centralities" or plotting == "RV0s") and not is_mc_and_data:
                 ssnames = info_decay.get_ssname_list()
-            if plotting == "diff_cent_and_diff_RV0s":
+                print(len(fHistoParameter), "list ", ssnames)
+            if plotting == "diff_cent_and_diff_RV0s" and not is_mc_and_data:
                 ssnames.append(info_decay.get_ssname())
                 RV0_list = info_decay.get_RV0_list()
-            if plotting == "diff_cent_and_diff_occupancies":
+            if plotting == "diff_cent_and_diff_occupancies" and not is_mc_and_data:
                 ssnames.append(info_decay.get_ssname())
                 occup_list = info_decay.get_occupancy_list()
             if is_mc_and_data:
@@ -339,7 +341,7 @@ class Plot_yield:
                     leg.AddEntry(histo[icut],"{0}%-{1}%".format(cent1, cent2),"ep")
                 else:
                     leg.AddEntry(histo[icut],"{0}%-{1}% x {2}^{{{3}}}".format(cent1, cent2, scaling, len(fHistoParameter)-icut),"ep")
-            if (plotting == "RV0s" or plotting == "diff_cent_and_diff_RV0s")and not is_mc_and_data:
+            if (plotting == "RV0s" or plotting == "diff_cent_and_diff_RV0s") and not is_mc_and_data:
                 if plotting == "diff_cent_and_diff_RV0s":
                     if icut < len(RV0_list)-1:
                         V0_radius_min = RV0_list[icut]
@@ -385,7 +387,10 @@ class Plot_yield:
                 h1ratio1[iratio] = fHistoParameter[iratio].Clone("h1ratio");
                 h1ratio1[iratio].Reset();
                 h1ratio1[iratio].Sumw2();
-                h1ratio1[iratio].Divide(fHistoParameter[iratio], fHistoParameter[len(fHistoParameter)-1], 1., 1., "G");
+                if plotting == "occupancies" or plotting == "diff_cent_and_diff_occupancies":
+                    h1ratio1[iratio].Divide(fHistoParameter[iratio], fHistoParameter[0], 1., 1., "G");
+                else:
+                    h1ratio1[iratio].Divide(fHistoParameter[iratio], fHistoParameter[len(fHistoParameter)-1], 1., 1., "G");
 
             #finding minimum and max of the histogram
             yMin_ratio, yMax_ratio = self.set_y_min_y_max(h1ratio1, type_of_histo, scaling, ratio)
@@ -396,7 +401,7 @@ class Plot_yield:
             elif plotting == "centralities":
                 FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{cent}{cent all}",0., 20.)
             elif plotting == "occupancies" or "diff_cent_and_diff_occupancies":
-                FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{#it{FT0Occ}}{#it{FT0Occ} all}",0., 20.)
+                FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{#it{FT0Occ}}{0<#it{FT0Occ}<10^{4}}",0., 20.)
 
             set_frame(frame2, 0.10, 0.10, 1.0 , 0.6, 0.09, 0.09, 0.01, 0.01)
             frame2.GetYaxis().CenterTitle(True);

@@ -1,4 +1,8 @@
-# This code was written by Julia Schlägel (July 2024)
+# This code is based on the code provided by Daiki Sekihata in his repository
+# https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
+# This code was written by Alica Enderich (Febuary 2024)
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import ROOT
 import ctypes
@@ -31,6 +35,36 @@ class Compare:
         self.cent1 = cent1
         self.cent2 = cent2
 
+    def set_y_min_y_max(self, histo_list, ratio = False):
+        yMax_, yMax_1 = -100, -100
+        yMin_, yMin_1 = 100, 100
+        for i in range(len(histo_list)-1):
+            histo_list[i].BufferEmpty(-1)
+            histo_list[i+1].BufferEmpty(-1)
+            Nbins = histo_list[i].GetNbinsX()+1
+            for ibin in range(Nbins):
+                if yMax_ < histo_list[i].GetBinContent(ibin) and histo_list[i].GetBinContent(ibin) != 0:
+                    yMax_ = histo_list[i].GetBinContent(ibin)
+                if yMin_ > histo_list[i].GetBinContent(ibin) and histo_list[i].GetBinContent(ibin) > 0:
+                    yMin_ = histo_list[i].GetBinContent(ibin)
+            Nbins1 = histo_list[i+1].GetNbinsX()+1
+            for ibin in range(Nbins1):
+                if yMax_1 < histo_list[i+1].GetBinContent(ibin) and histo_list[i+1].GetBinContent(ibin) != 0:
+                    yMax_1 = histo_list[i+1].GetBinContent(ibin)
+                if yMin_1 > histo_list[i+1].GetBinContent(ibin) and histo_list[i+1].GetBinContent(ibin) > 0:
+                    yMin_1 = histo_list[i+1].GetBinContent(ibin)
+            if yMax_1 > yMax_:
+                yMax_ = yMax_1
+            if yMin_1 < yMin_:
+                yMin_ = yMin_1
+        if not ratio:
+            yMax_ = 1.2*yMax_
+            yMin_ = 0.4*yMin_
+        else:
+            yMax_ = 1.01*yMax_
+            yMin_ = 0.1*yMin_
+        return yMin_, yMax_
+
     def set_title(self, name, h1, V0_min, V0_max):
         h1.SetXTitle("p_{T} (GeV/c)")
         if name == "acc":
@@ -57,6 +91,10 @@ class Compare:
             title = "#varepsilon x A centrality {0}%-{1}%".format(self.cent1, self.cent2)
             y_title = "#varepsilon x A"
             h1.SetYTitle("#varepsilon x A")
+        if name == "eff_acc_all_system":
+            title = "#varepsilon x A x BR"
+            y_title = "#varepsilon x A x BR"
+            h1.SetYTitle("#varepsilon x A x BR")
         if name == "inv_cross_section":
             title = "Invariant cross section centrality {0}%-{1}%".format(self.cent1, self.cent2)
             y_title = "#frac{1}{2#pip_{T}} #frac{d^{2}#sigma}{dp_{T}dy} [GeV^{-2} c^{3}]"
@@ -95,6 +133,10 @@ class Compare:
             h1.SetYTitle("#frac{1}{#it{N}_{ev}}#frac{d#it{N}^{raw}}{d#it{p}_{T}} (GeV/#it{c})^{-1}")
         if name == "raw_diff_mc_pkl":
             title = "Raw yield of different systems {0}<R<{1} cm MC".format(V0_min, V0_max)
+            y_title = "#frac{1}{#it{N}_{ev}}#frac{d#it{N}^{raw}}{d#it{p}_{T}} (GeV/#it{c})^{-1}"
+            h1.SetYTitle("#frac{1}{#it{N}_{ev}}#frac{d#it{N}^{raw}}{d#it{p}_{T}} (GeV/#it{c})^{-1}")
+        if name == "raw_yields_diff_periods":
+            title = "Raw yields of different settings {0} - {1}%".format(self.cent1, self.cent2)
             y_title = "#frac{1}{#it{N}_{ev}}#frac{d#it{N}^{raw}}{d#it{p}_{T}} (GeV/#it{c})^{-1}"
             h1.SetYTitle("#frac{1}{#it{N}_{ev}}#frac{d#it{N}^{raw}}{d#it{p}_{T}} (GeV/#it{c})^{-1}")
         return title, y_title
@@ -411,109 +453,142 @@ class Compare:
         ROOT.SetOwnership(can, False)
         can.SaveAs(name_plot.Data())
 
-    def comp_with_other_data(self, histo_list, name, name_plot, energy, V0_min, V0_max):
-        # comp_partner can be: acc, eff, corr, or eff_times_acc to make the comparison for this variable
-        # to the result from run
-        if name == "eff_times_acc":
-            if decay == "pcm":
-                histo_list[1].Scale(0.98823)
-            if decay == "dalitz":
-                histo_list[1].Scale(0.01174)
-
-        #max_histo = histo_list[0].GetMaximum()
-        #min_histo = histo_list[0].GetMinimum()
-        #if name != "acc":
-#            min_histo_comp = histo_list[1].GetMinimum()
-        #    max_histo_comp = histo_list[1].GetMaximum()
-
-#        else:
-#            min_histo_comp, max_histo_comp = get_graph_y_range(histo_list[1])
-
-#        max_y = 1.5 * max(max_histo, max_histo_comp)
-                #finding minimum and max of the histogram
-        yMax_, yMax_1 = -100, -100
-        yMin_, yMin_1 = 100, 100
-        for i in range(len(histo_list)-1):
-            histo_list[i].BufferEmpty(-1)
-            histo_list[i+1].BufferEmpty(-1)
-            Nbins = histo_list[i].GetNbinsX()+1
-            for ibin in range(Nbins):
-                if yMax_ < histo_list[i].GetBinContent(ibin) and histo_list[i].GetBinContent(ibin) != 0:
-                    yMax_ = histo_list[i].GetBinContent(ibin)
-                if yMin_ > histo_list[i].GetBinContent(ibin) and histo_list[i].GetBinContent(ibin) > 0:
-                    yMin_ = histo_list[i].GetBinContent(ibin)
-            Nbins1 = histo_list[i+1].GetNbinsX()+1
-            for ibin in range(Nbins1):
-                if yMax_1 < histo_list[i+1].GetBinContent(ibin) and histo_list[i+1].GetBinContent(ibin) != 0:
-                    yMax_1 = histo_list[i+1].GetBinContent(ibin)
-                if yMin_1 > histo_list[i+1].GetBinContent(ibin) and histo_list[i+1].GetBinContent(ibin) > 0:
-                    yMin_1 = histo_list[i+1].GetBinContent(ibin)
-            if yMax_1 > yMax_:
-                yMax_ = yMax_1
-            if yMin_1 < yMin_:
-                yMin_ = yMin_1
-        yMax_ = 1.2*yMax_
-        yMin_ = 0.4*yMin_
+    def comp_with_other_data(self, histo_list, name, name_plot, energy_other_file,system_other_file, info_decay, ratio = False):
+        print("in", flush = True)
+        TGaxis.SetMaxDigits(3);
+        V0_min, V0_max = info_decay.get_V0_radius_min(), info_decay.get_V0_radius_max()
+        title, y_title = self.set_title(name, histo_list[0], V0_min, V0_max)
+        yMin_, yMax_ = self.set_y_min_y_max(histo_list)
         histo_list[0].SetMaximum(yMax_)
         histo_list[0].SetMinimum(yMin_)
-        c1 = ROOT.TCanvas("c1", "c1", 800, 800)
+        print("almost", flush = True)
+        c1 = TCanvas("c0","c0",0,0,800,800);
+        if ratio:
+            c1.Divide(1,2,1e-3,1e-3);
+            p1 = c1.cd(1);
+            p1.SetPad(0,0.3, 1,1)
+            p1.SetMargin(0.15,0.02,0.,0.15);
+            p1.SetBottomMargin(0.005)
+        else:
+            p1 = c1.cd()
+            p1.SetPad(0,0.1,2,2);
+            p1.SetMargin(0.18,0.1,0.1,0.15);
+            #p1.SetTicks(1,1);
+        p1.SetLogy();
 
-        p1 = c1.cd()
-        p1.SetPad(0.0, 0.0, 1, 1)
-        p1.SetMargin(0.15,0.05,0.1,0.15) #0.15,0.02,0.1,0.0
-        p1.SetTicks(1,1)
-        p1.SetLogy()
-
-        title, y_title = self.set_title(name, histo_list[0], V0_min, V0_max)
+        frame1 = p1.DrawFrame(0., yMin_, 20., yMax_);
+        FrameSettings(frame1, "#it{p}_{T} (GeV/#it{c})", "{}".format(y_title), 0., 20.)
+        set_frame(frame1, 0.045, 0.045, 1.0, 1.52, 0.045, 0.045, 0.01, 0.01)
+        ROOT.SetOwnership(frame1,False)
 
         if name == "corr_diff_pkl" or name == "eff_acc_diff_pkl" or name == "raw_diff_data_pkl" or name == "raw_diff_mc_pkl":
             legend_names = ["Pb--Pb cent {0}%-{1}% #sqrt{{s_{{NN}}}} = 5.36 TeV".format(self.cent1, self.cent2), "O--O cent 0%-100% #sqrt{{s}} = 5.36 TeV", "pO cent 0%-100%"]
         else:
-            legend_names = ["#sqrt{{s_{{NN}}}} = {0}".format(energy), "#sqrt{{s_{{NN}}}} = 5.02 TeV"]
-        legend1 = ROOT.TLegend(0.60, 0.6, 0.9, 0.5)
+            system = info_decay.get_system()
+            if '-' in system:
+                list_system = system.split("-")
+                system = list_system[0] + "#font[122]{-}" + list_system[1]
+            if '-' in system_other_file:
+                list_system_other_file = system_other_file.split("-")
+                system_other_file = list_system_other_file[0] + "#font[122]{-}" + list_system_other_file[1]
+            legend_names = ["#sqrt{{s_{{NN}}}} = {0}, {1}".format(info_decay.get_energy(), system), "#sqrt{{s_{{NN}}}} = {0}, {1}".format(energy_other_file, system_other_file)]
+        if name =="raw_yields_diff_periods":
+            #legend_names = ["EM_LHC23", "EM_LHC24ar", "EM_LHC25an"]
+            legend_names = ["EM_LHC23", "EM_LHC23_new_settings"]
+        if name == "eff_acc_all_system":
+            legend_names = ["OO, #sqrt{s} = 5.36 TeV", "pO, #sqrt{s} = 9.61 TeV", "pp, #sqrt{s} = 5.36 TeV", "{0}, #sqrt{{s_{{NN}}}} = {1}, 0-20%".format(system, info_decay.get_energy()), "{0}, #sqrt{{s_{{NN}}}} = {1}, 0-20%".format(energy_other_file, system_other_file), "{0}, #sqrt{{s_{{NN}}}} = {1}, 20-40%".format(system, info_decay.get_energy()), "{0}, #sqrt{{s_{{NN}}}} = {1}, 20-40%".format(energy_other_file, system_other_file), "{0}, #sqrt{{s_{{NN}}}} = {1}, 40-60%".format(system, info_decay.get_energy()), "{0}, #sqrt{{s_{{NN}}}} = {1}, 40-60%".format(energy_other_file, system_other_file), "{0}, #sqrt{{s_{{NN}}}} = {1}, 60-80%".format(system, info_decay.get_energy()),"{0}, #sqrt{{s_{{NN}}}} = {1}, 60-80%".format(energy_other_file, system_other_file)]
+        legend1 = ROOT.TLegend(0.61, 0.59, 0.71, 0.49)
         legend1.SetBorderSize(0)
         legend1.SetFillColor(kWhite)
         legend1.SetFillStyle(0)
-        legend1.SetTextSize(0.03)
+        legend1.SetTextSize(0.025)
 
-        color = [ROOT.kBlue, ROOT.kOrange, ROOT.kMagenta]
+        #color = [kRed-4, kGreen-3,kBlue-6, kMagenta, kMagenta+3, 922, 923, kBlack]
+        color = [kRed, 802, 401, kGreen+1, kGreen-1, kCyan ,kBlue, kMagenta, kMagenta+3, 922, 923, kBlack, kBlack, kBlack, kBlack, kBlack, kBlack, kBlack]
+        count = 0
+
+        print("HERE!", flush = True)
+        print(len(color), flush = True)
+        print(len(legend_names), flush = True)
+        print(len(histo_list), flush = True)
         for i in range (len(histo_list)):
+            print("start", i, flush = True)
+            print(histo_list[i], flush = True)
             histo_list[i].SetYTitle(y_title)
             histo_list[i].SetLineColor(color[i])
             histo_list[i].SetMarkerColor(color[i])
-            histo_list[i].SetMarkerSize(1.3)
             histo_list[i].SetMarkerStyle(kFullCircle)
+            histo_list[i].SetMarkerSize(1.3)
             histo_list[i].Draw("E1P Same")
             legend1.AddEntry(histo_list[i], legend_names[i], "P")
+            print("finish", i, flush = True)
         legend1.Draw()
+        ROOT.SetOwnership(legend1,False);
 
-        txt = set_txt(0.05,0.92,1.05,0.92,"NDC",0.04, 22)
-        txt.AddText(title)
+        if ratio:
+            p2 = c1.cd(2);
+            p2.SetPad(0,0,1,0.3);
+            p2.SetMargin(0.15,0.02,0.22,0.0);
+            p2.SetTicks(1,1)
+            p2.SetTopMargin(0.05)
+            p2.SetBottomMargin(0.3)
+            #p2.SetLogy();
+
+            line1 = TLine(0,1,20.,1);
+            line1.SetLineColor(kBlack);
+            line1.SetLineStyle(1);
+            line1.SetLineWidth(1);
+            line1.Draw("");
+            ROOT.SetOwnership(line1,False);
+
+            h1ratio1 = [0]*len(histo_list)
+            for iratio in range(len(histo_list)):
+                h1ratio1[iratio] = histo_list[iratio].Clone("h1ratio");
+                h1ratio1[iratio].Sumw2();
+                h1ratio1[iratio].Divide(histo_list[iratio], histo_list[0], 1., 1., "G")
+
+            #finding minimum and max of the histogram
+            yMin_ratio, yMax_ratio = self.set_y_min_y_max(h1ratio1, True)
+
+            frame2 = p2.DrawFrame(0., yMin_ratio, 20., yMax_ratio);
+            FrameSettings(frame2, "#it{p}_{T} (GeV/#it{c})", "#frac{{{0}}}{{{1}}}".format(energy_other_file, info_decay.get_energy()),0., 20.)
+            frame2.GetXaxis().SetTitleSize(0.10);
+            frame2.GetYaxis().SetTitleSize(0.10);
+            frame2.GetXaxis().SetTitleOffset(1.0);
+            frame2.GetYaxis().SetTitleOffset(0.7);
+            frame2.GetXaxis().SetLabelSize(0.10);
+            frame2.GetYaxis().SetLabelSize(0.10);
+            frame2.GetYaxis().CenterTitle(True);
+            frame2.GetXaxis().SetLabelOffset(0.01);
+            frame2.GetYaxis().SetLabelOffset(0.01);
+            ROOT.SetOwnership(frame2,False);
+            for iratio in range(len(histo_list)):
+                #print(f"iratio {iratio}")
+                h1ratio1[iratio].SetMarkerSize(1.5)
+                h1ratio1[iratio].SetMarkerStyle(kFullCircle)
+                h1ratio1[iratio].SetLineColor(color[iratio])
+                h1ratio1[iratio].SetMarkerColor(color[iratio])
+                h1ratio1[iratio].DrawCopy("E1,same");
+            line1 = TLine(0,1,20.,1);
+            line1.SetLineColor(kBlack);
+            line1.SetLineStyle(1);
+            line1.SetLineWidth(1);
+            line1.Draw("");
+            ROOT.SetOwnership(line1,False);
+
+        c1.cd()
+        txt = set_txt(0.1,0.9,1.,0.95,"NDC",0.045, 22)
+        txt.AddText("{}".format(TString(title)))
         txt.Draw()
-        ROOT.SetOwnership(txt,False)
+        ROOT.SetOwnership(txt,False);
+        set_txt_of_plot(info_decay, 0.87, 0.83, 0.87, 0.83, False, 0.025, len(histo_list), False, True)
 
-        #txt = set_txt(0.85,0.8,0.9,0.8,"NDC",0.02, 33)
-        #txt.AddText("this thesis")
-        #txt.Draw()
-        #ROOT.SetOwnership(txt,False)
+        c1.Modified();
+        c1.Update();
+        ROOT.SetOwnership(c1,False);
+        c1.SaveAs(name_plot.Data());
+        c1.Close();
 
-        x = histo_list[0].GetXaxis()
-        x.SetTitleSize(0.04)
-        x.SetTitleFont(42)
-        x.SetTitleOffset(0.9)
-        x.SetLabelFont(42)
-        x.SetLabelSize(0.035)
-
-        y = histo_list[0].GetYaxis()
-        y.SetTitleSize(0.04)
-        y.SetTitleFont(42)
-        y.SetTitleOffset(1.65)
-        y.SetLabelFont(42)
-        y.SetLabelSize(0.035)
-        histo_list[0].SetMinimum(5*1e-5)
-
-        c1.Update()
-        c1.SaveAs(name_plot.Data())
 
 
 

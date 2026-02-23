@@ -1,4 +1,5 @@
 # This code was written by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import ROOT
 import ctypes
@@ -36,6 +37,8 @@ class Corrected_yield:
         h_corrected.Divide(eff_acc)
         h_corrected.Scale(1/deltarap)
         h_corrected.Scale(1/(2* np.pi))
+        h_corrected.SetTitle("")
+        h_corrected.GetYaxis().SetTitle("corr yield")
 
         if scale_pT == "true":
             info_decay.scale_by_pt(h_corrected)

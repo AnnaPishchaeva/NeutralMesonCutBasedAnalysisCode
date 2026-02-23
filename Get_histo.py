@@ -1,4 +1,8 @@
-# This code was written by Julia Schlägel (July 2024)
+# This code is based on the code provided by Daiki Sekihata in his repository
+# https://github.com/dsekihat/photon_sw_run3 for photon analysis in ALICE Run 3
+# This code was written by Alica Enderich (Febuary 2024)
+# This code was modified and extended by Julia Schlägel (July 2024)
+# This code was modified and extended by Anna Pishchaeva (October 2025)
 
 import ROOT
 import yaml
@@ -195,7 +199,7 @@ class Get_histo: #in this class all central things are done that are needed in m
             hist = self.rootfile.Get(hist_name)
         return hist
 
-    def get_eff_acc_BR_from_other_file(self, hist_name, path_comp):
+    def get_eff_acc_BR_from_other_file(self, hist_name, path_comp, BR):
         if path_comp != "":
             dir_1 = self.rootfile.Get(path_comp)
             acc = self.dir_1.Get(hist_name)
@@ -215,7 +219,7 @@ class Get_histo: #in this class all central things are done that are needed in m
             err_eff = eff.GetBinError(ibin)/bin_eff
             error = bin_acc*bin_eff*np.sqrt(err_acc*err_acc + err_eff*err_eff)
             print("error: ", error)
-            eff_acc_BR.SetBinContent(ibin, bin_acc*bin_eff*0.988)
+            eff_acc_BR.SetBinContent(ibin, bin_acc*bin_eff*BR)
             eff_acc_BR.SetBinError(ibin, error)
         return eff_acc_BR
 

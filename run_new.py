@@ -52,19 +52,19 @@ def run_new():
         for is_start_pt in r_config.get_start_pt_array():
             for meson in r_config.get_meson_array():
                 folder = os.path.join(r_config.get_my_dir_data(), r_config.get_output_folder(), "{0}".format(meson))
-                config_file_pcm = r_config.get_config_file(meson, "data", "PCM")
-                config_file_dalitz = r_config.get_config_file(meson, "data", "Dalitz")
+                config_file_pcm_data = r_config.get_config_file(meson, "data", "PCM")
+                config_file_pcm_mc = r_config.get_config_file(meson, "mc", "PCM")
                 analysis = Analysis(r_config.is_diff_cent(), r_config.is_compare_RV0(), r_config.is_compare_occupancy(), r_config.is_diff_RV0(), r_config.get_all_cent(), is_start_pt, r_config.get_date(), folder, r_config.get_suffix(), r_config.get_energy(), r_config.get_system())
-                analysis.comp_dalitz_pcm(config_file_pcm, config_file_dalitz, meson)
+                analysis.comp_dalitz_pcm(config_file_pcm_data, config_file_pcm_mc, meson)
 
     if r_config.is_comp_eta_pi0():
         for is_start_pt in r_config.get_start_pt_array():
             for decay in r_config.get_decay_array():
                 folder = os.path.join(r_config.get_my_dir_data(), r_config.get_output_folder(), "pi0_eta_comparison")
-                config_file_pi0 = r_config.get_config_file("pi0", "data", decay)
-                config_file_eta = r_config.get_config_file("eta", "data", decay)
+                config_file_pi0_data = r_config.get_config_file("pi0", "data", decay)
+                config_file_pi0_mc = r_config.get_config_file("pi0", "mc", decay)
                 analysis = Analysis(r_config.is_diff_cent(), r_config.is_compare_RV0(), r_config.is_compare_occupancy(), r_config.is_diff_RV0(), r_config.get_all_cent(), is_start_pt, r_config.get_date(), folder, r_config.get_suffix(), r_config.get_energy(), r_config.get_system())
-                analysis.comp_eta_pi0(config_file_pi0, config_file_eta, decay)
+                analysis.comp_eta_pi0(config_file_pi0_data, config_file_pi0_mc, decay)
 
     if r_config.is_comparison_to_other_data():
         energy_of_other_file = r_config.get_energy_of_other_file()
@@ -77,17 +77,19 @@ def run_new():
                     filename_comp = r_config.get_filename_comp(decay)
                     path_comp = r_config.get_path_in_filename_comp(decay)
                     histname_comp = r_config.get_histoname_in_filename_comp(decay)
-                    config = r_config.get_config_file("pi0", "data", decay)
+                    config_data = r_config.get_config_file("pi0", "data", decay)
+                    config_mc = r_config.get_config_file("pi0", "mc", decay)
                     analysis = Analysis(r_config.is_diff_cent(), r_config.is_compare_RV0(), r_config.is_compare_occupancy(), r_config.is_diff_RV0(), r_config.get_all_cent(), is_start_pt, r_config.get_date(), folder, r_config.get_suffix(), r_config.get_energy(), r_config.get_system())
-                    analysis.comp_to_other_file(energy_of_other_file, system_of_other_file, decay, "pi0", filename_comp, obj_comp, path_comp, histname_comp, r_config.is_ratio_comp(), config)
+                    analysis.comp_to_other_file(energy_of_other_file, system_of_other_file, decay, "pi0", filename_comp, obj_comp, path_comp, histname_comp, r_config.is_ratio_comp(), config_data, config_mc)
             if r_config.get_comp_system() == "Dalitz_PCM":
                 for meson in r_config.get_meson_array():
                     folder = os.path.join(r_config.get_my_dir_data(), r_config.get_output_folder(), "{0}".format(meson))
                     filename_comp = r_config.get_filename_comp(meson)
                     path_comp = r_config.get_path_in_filename_comp(meson)
                     histname_comp = r_config.get_histoname_in_filename_comp(meson)
-                    config = r_config.get_config_file(meson, "data", "PCM")
+                    config_data = r_config.get_config_file(meson, "data", "PCM")
+                    config_mc = r_config.get_config_file(meson, "mc", "PCM")
                     analysis = Analysis(r_config.is_diff_cent(), r_config.is_compare_RV0(), r_config.is_compare_occupancy(), r_config.is_diff_RV0(), r_config.get_all_cent(), is_start_pt, r_config.get_date(), folder, r_config.get_suffix(), r_config.get_energy(), r_config.get_system())
-                    analysis.comp_to_other_file(energy_of_other_file, system_of_other_file, "PCM", meson, filename_comp, obj_comp, path_comp, histname_comp, r_config.is_ratio_comp(), config)
+                    analysis.comp_to_other_file(energy_of_other_file, system_of_other_file, "PCM", meson, filename_comp, obj_comp, path_comp, histname_comp, r_config.is_ratio_comp(), config_data, config_mc)
 run_new()
 
